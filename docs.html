@@ -1,0 +1,1836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Documentation - Chameleon</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .stats {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+
+        .filters {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-group label {
+            font-weight: 500;
+            color: #666;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .request-card {
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+
+        .request-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .request-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .request-header:hover {
+            background: #f9f9f9;
+        }
+
+        .request-method {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            margin-right: 1rem;
+            text-transform: uppercase;
+        }
+
+        .method-get { background: #e3f2fd; color: #1976d2; }
+        .method-post { background: #e8f5e9; color: #388e3c; }
+        .method-put { background: #fff3e0; color: #f57c00; }
+        .method-patch { background: #fce4ec; color: #c2185b; }
+        .method-delete { background: #ffebee; color: #d32f2f; }
+        .method-options { background: #f3e5f5; color: #7b1fa2; }
+
+        .request-path {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 1rem;
+            color: #333;
+            flex: 1;
+        }
+
+        .request-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        .status-2xx { background: #e8f5e9; color: #2e7d32; }
+        .status-3xx { background: #fff3e0; color: #f57c00; }
+        .status-4xx { background: #ffebee; color: #c62828; }
+        .status-5xx { background: #ffebee; color: #d32f2f; }
+
+        .request-toggle {
+            margin-left: 1rem;
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        .request-content {
+            display: none;
+            padding: 1.5rem;
+        }
+
+        .request-content.active {
+            display: block;
+        }
+
+        .section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #667eea;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .headers-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.5rem;
+        }
+
+        .headers-table th,
+        .headers-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .headers-table th {
+            background: #f9f9f9;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .headers-table td {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+        }
+
+        .body-container {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 1rem;
+            overflow-x: auto;
+        }
+
+        .body-content {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .body-json {
+            color: #333;
+        }
+
+        .body-html {
+            color: #0066cc;
+        }
+
+        .body-text {
+            color: #333;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: #999;
+        }
+
+        .hash {
+            font-size: 0.8rem;
+            color: #999;
+            font-family: 'Monaco', 'Menlo', monospace;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🦎 Chameleon API Documentation</h1>
+        <p>Generated on 2025-12-27 19:34:53 • 14 recorded requests</p>
+    </div>
+
+    <div class="container">
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value">14</div>
+                <div class="stat-label">Total Requests</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="visible-count">14</div>
+                <div class="stat-label">Visible</div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label for="search">Search:</label>
+                <input type="text" id="search" placeholder="Filter by path, method, or status..." style="min-width: 300px;">
+            </div>
+            <div class="filter-group">
+                <label for="method-filter">Method:</label>
+                <select id="method-filter">
+                    <option value="">All Methods</option>
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                    <option value="PUT">PUT</option>
+                    <option value="PATCH">PATCH</option>
+                    <option value="DELETE">DELETE</option>
+                    <option value="OPTIONS">OPTIONS</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="status-filter">Status:</label>
+                <select id="status-filter">
+                    <option value="">All Statuses</option>
+                    <option value="2xx">2xx Success</option>
+                    <option value="3xx">3xx Redirect</option>
+                    <option value="4xx">4xx Client Error</option>
+                    <option value="5xx">5xx Server Error</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="requests-container">
+            
+            <div class="request-card" data-method="GET" data-path="/admin/courses" data-status="304">
+                <div class="request-header" onclick="toggleRequest('7d31baeb0d8b151f908a4ff172b9591be4c5338e0463c2bacad7813177eb21e9')">
+                    <div style="display: flex; align-items: center; flex: 1;">
+                        <span class="request-method method-get">GET</span>
+                        <span class="request-path">/admin/courses</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span class="request-status status-3xx">304</span>
+                        <span class="request-toggle" id="toggle-7d31baeb0d8b151f908a4ff172b9591be4c5338e0463c2bacad7813177eb21e9">▼</span>
+                    </div>
+                </div>
+                <div class="request-content" id="content-7d31baeb0d8b151f908a4ff172b9591be4c5338e0463c2bacad7813177eb21e9">
+                    <div class="hash">Hash: 7d31baeb0d8b151f908a4ff172b9591be4c5338e0463c2bacad7813177eb21e9</div>
+
+                    <div class="section">
+                        <div class="section-title">Response Headers</div>
+                        <table class="headers-table">
+                            <thead>
+                                <tr>
+                                    <th>Header</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Credentials</strong></td>
+                                    <td>true<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Origin</strong></td>
+                                    <td>http://localhost:4321<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Alt-Svc</strong></td>
+                                    <td>h3=&#34;:443&#34;; ma=2592000<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Date</strong></td>
+                                    <td>Sat, 27 Dec 2025 22:27:58 GMT<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Etag</strong></td>
+                                    <td>W/&#34;108e-UDSHPZPATYJ/NY0/7z6oiSVwl2M&#34;<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Vary</strong></td>
+                                    <td>Origin<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>X-Powered-By</strong></td>
+                                    <td>Express<br></td>
+                                </tr>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">Response Body</div>
+                        <div class="body-container">
+                            <div class="body-content body-empty"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="request-card" data-method="GET" data-path="/admin/courses/1" data-status="200">
+                <div class="request-header" onclick="toggleRequest('0ad33c0da1850a277a7bd2555510d1dc3069888015548d5333353dbeee317fd2')">
+                    <div style="display: flex; align-items: center; flex: 1;">
+                        <span class="request-method method-get">GET</span>
+                        <span class="request-path">/admin/courses/1</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span class="request-status status-2xx">200</span>
+                        <span class="request-toggle" id="toggle-0ad33c0da1850a277a7bd2555510d1dc3069888015548d5333353dbeee317fd2">▼</span>
+                    </div>
+                </div>
+                <div class="request-content" id="content-0ad33c0da1850a277a7bd2555510d1dc3069888015548d5333353dbeee317fd2">
+                    <div class="hash">Hash: 0ad33c0da1850a277a7bd2555510d1dc3069888015548d5333353dbeee317fd2</div>
+
+                    <div class="section">
+                        <div class="section-title">Response Headers</div>
+                        <table class="headers-table">
+                            <thead>
+                                <tr>
+                                    <th>Header</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Credentials</strong></td>
+                                    <td>true<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Origin</strong></td>
+                                    <td>http://localhost:4321<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Alt-Svc</strong></td>
+                                    <td>h3=&#34;:443&#34;; ma=2592000<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Content-Length</strong></td>
+                                    <td>8358<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Content-Type</strong></td>
+                                    <td>application/json; charset=utf-8<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Date</strong></td>
+                                    <td>Sat, 27 Dec 2025 22:28:01 GMT<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Etag</strong></td>
+                                    <td>W/&#34;20a6-pD1c/1eNgBJypibSLqO&#43;V3BU6yk&#34;<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Vary</strong></td>
+                                    <td>Origin<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>X-Powered-By</strong></td>
+                                    <td>Express<br></td>
+                                </tr>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">Response Body</div>
+                        <div class="body-container">
+                            <div class="body-content body-json">{
+  &#34;_count&#34;: {
+    &#34;classes&#34;: 14,
+    &#34;professors&#34;: 1,
+    &#34;students&#34;: 0
+  },
+  &#34;acronym&#34;: &#34;FIS1533&#34;,
+  &#34;classes&#34;: [
+    {
+      &#34;courseId&#34;: 1,
+      &#34;description&#34;: &#34;Fundamentos de la electrostática: carga, fuerza de Coulomb y campo eléctrico.&#34;,
+      &#34;id&#34;: 39,
+      &#34;materials&#34;: [],
+      &#34;objectives&#34;: &#34;\n            - Concepto de carga eléctrica: naturaleza, tipos y conservación\n            - Ley de Coulomb: interacción entre cargas puntuales\n            - Principio de superposición para fuerzas eléctricas\n            - Definición de campo eléctrico como fuerza por unidad de carga\n            - Campo eléctrico de una carga puntual\n            - Representación con líneas de campo\n          &#34;,
+      &#34;orderIndex&#34;: 1,
+      &#34;slots&#34;: [],
+      &#34;title&#34;: &#34;Clase 1 — Carga, Fuerza Eléctrica y Campo Eléctrico&#34;
+    },
+    {
+      &#34;courseId&#34;: 1,
+      &#34;description&#34;: &#34;Cálculo de campos eléctricos en distribuciones de carga discretas y continuas.&#34;,
+      &#34;id&#34;: 40,
+      &#34;materials&#34;: [],
+      &#34;objectives&#34;: &#34;\n            - Superposición aplicada a sistemas con múltiples cargas\n            - Diferencia entre distribuciones discretas y continuas\n            - Densidad de carga: lineal, superficial y volumétrica\n            - Método integral para calcular campos de distribuciones\n            - Fuerza eléctrica sobre una distribución de carga\n          &#34;,
+      &#34;orderIndex&#34;: 2,
+      &#34;slots&#34;: [],
+      &#34;title&#34;: &#34;Clase 2 — Campo Eléctrico y Distribuciones de Carga&#34;
+    },
+    {
+      &#34;courseId&#34;: 1,
+      &#34;description&#34;: &#34;Ley de Gauss y su aplicación a problemas con simetría.&#34;,
+      &#34;id&#34;: 41,
+      &#34;materials&#34;: [],
+      &#34;objectives&#34;: &#34;\n            - Concepto de flujo eléctrico a través de una superficie\n            - Ley de Gauss y su vínculo con la carga encerrada\n            - Identificación de casos con simetría\n            - Criterios para decidir entre Gauss o integración directa\n            - Definición de potencial eléctrico y relación con el campo\n          &#34;,
+      &#34;orderIndex&#34;: 3,
+      &#34;slots&#34;: [],
+      &#34;title&#34;: &#34;Clase 3 — Flujo, Ley de Gauss y Potencial Eléctrico&#34;
+    },
+    {
+      &#34;courseId&#34;: 1,
+      &#34;description&#34;: &#34;Energía potencial eléctrica, trabajo y superficies equipotenciales.&#34;,
+      &#34;id&#34;: 42,
+      &#34;materials&#34;: [],
+      &#34;objectives&#34;: &#34;\n            - Trabajo realizado por una fuerza eléctrica\n            - Relación entre energía potencial eléctrica y potencial\n            - Distinción entre variación de energía potencial y trabajo\n            - Energía de un sistema de cargas\n            - Superficies equipotenciales y su interpretación\n            - Campo eléctrico como campo conservativo\n          &#34;,
+      &#34;orderIndex&#34;: 4,
+      &#34;slots&#34;: [],
+      &#34;title&#34;: &#34;Clase 4 — Energía, Trabajo y Potencial Eléctrico&#34;
+    },
+    {
+      &#34;courseId&#34;: 1,
+      &#34;description&#34;: &#34;Propiedades de conductores en equilibrio y capacitores.&#34;,
+      &#34;id&#34;: 43,
+      &#34;materials&#34;: [],
+      &#34;objectives&#34;: &#34;\n            - Propiedades de los conductores en equilibrio electrostático\n            - Distribución de carga y campo en el interior de un conductor\n            - Definición de capacitancia y cálculo para geometrías simples\n            - Energía almacenada en un capacitor\n            - Asociación de capacitores en serie y paralelo\n          &#34;,
+      &#34;orderIndex&#34;: 5,
+      &#34;slots&#34;: [],
+      &#34;title&#34;: &#34;Clase 5 — Conductores y Capacitancia&#34;
+    },
+    {
+      &#34;courseId&#34;: 1,
+      &#34;description&#34;: &#34;Efecto de los dieléctricos sobre la capacitancia.&#34;,
+      &#34;id&#34;: 44,
+      &#34;materials&#34;: [],
+      &#34;objectives&#34;: &#34;\n            - Definición de dieléctrico y efecto sobre la capacitancia\n            - Polarización y campo en el interior del material\n            - Densidad de carga libre y de carga inducida\n            - Aplicación de la Ley de Gauss en dieléctricos\n            - Cálculo de capacitancia con dieléctricos\n          &#34;,
+      &#34;orderIndex&#34;: 6,
+      &#34;slots&#34;: [],
+      &#34;title&#34;: &#34;Clase 6 — Capacitores con Dieléctricos&#34;
+    },
+    {
+      &#34;courseId&#34;: 1,
+      &#34;description&#34;: &#34;Corriente eléctrica, resistividad y ley de Ohm microscópica.&#34;,
+      &#34;id&#34;: 45,
+      &#34;materials&#34;: [],
+      &#34;objectives&#34;: &#34;\n            - Resistividad y resistencia de materiales\n            - Definición del vector densidad de corriente\n            - Corriente como flujo de carga a través de una sección\n            - Ley de Ohm microscópica: relación entre campo eléctrico y corriente\n            - Cálculo diferencial de resistencias\n          &#34;,
+      &#34;orderIndex&#34;: 7,
+      &#34;slots&#34;: [],
+      &#34;title&#34;: &#34;Clase 7 — Intensidad de Corriente y Ley de Ohm&#34;
+    },
+    {
+      &#34;courseId&#34;: 1,
+      &#34;description&#34;: &#34;Análisis de circuitos mediante las leyes de Kirchhoff.&#34;,
+      &#34;id&#34;: 46,
+      &#34;materials&#34;: [],
+      &#34;objectives&#34;: &#34;\n            - Ley de corrientes (nodos) y ley de tensiones (mallas)\n            - Procedimiento sistemático para resolver circuitos\n            - Ley de Ohm macroscópica en resistores\n            - Reducción de resistores en serie y paralelo\n            - Asociación y equivalencia de capacitores\n          &#34;,
+      &#34;orderIndex&#34;: 8,
+      &#34;slots&#34;: [],
+      &#34;title&#34;: &#34;Clase 8 — Leyes de Kirchhoff y Circuitos&#34;
+    },
+    {
+      &#34;courseId&#34;: 1,
+      &#34;description&#34;: &#34;Carga y descarga de capacitores en circuitos RC.&#34;,
+      &#34;id&#34;: 47,
+      &#34;materials&#34;: [],
+      &#34;objectives&#34;: &#34;\n            - Proceso de carga y descarga de un capacitor\n            - Ecuaciones diferenciales y solución exponencial\n            - Constante de tiempo (τ) y su interpretación física\n          &#34;,
+      &#34;orderIndex&#34;: 9,
+      &#34;slots&#34;: [],
+      &#34;title&#34;: &#34;Clase 9 — Circuito RC&#34;
+    },
+    {
+      &#34;courseId&#34;: 1,
+      &#34;description&#34;: &#34;Introducción al magnetismo y fuerza sobre cargas en movimiento.&#34;,
+      &#34;id&#34;: 48,
+      &#34;materials&#34;: [],
+      &#34;objectives&#34;: &#34;\n            - Definición de la fuerza de Lorentz\n            - Movimiento circular uniforme en un campo magnético\n            - Trayectorias helicoidales: radio, paso y frecuencia\n            - Fuerza magnética sobre corrientes en conductores\n          &#34;,
+      &#34;orderIndex&#34;: 10,
+      &#34;slots&#34;: [],
+      &#34;title&#34;: &#34;Clase 10 — Fuerza de Lorentz&#34;
+    },
+    {
+      &#34;courseId&#34;: 1,
+      &#34;description&#34;: &#34;Cálculo de campos magnéticos mediante Biot-Savart y Ampère.&#34;,
+      &#34;id&#34;: 49,
+      &#34;materials&#34;: [],
+      &#34;objectives&#34;: &#34;\n            - Campo magnético a partir de la ley de Biot–Savart\n            - Aplicaciones de la ley de Ampère en geometrías simétricas\n            - Comparación entre ambos métodos y criterios de uso\n          &#34;,
+      &#34;orderIndex&#34;: 11,
+      &#34;slots&#34;: [],
+      &#34;title&#34;: &#34;Clase 11 — Ley de Biot–Savart y Ley de Ampère&#34;
+    },
+    {
+      &#34;courseId&#34;: 1,
+      &#34;description&#34;: &#34;Inducción electromagnética y leyes de Faraday y Lenz.&#34;,
+      &#34;id&#34;: 50,
+      &#34;materials&#34;: [],
+      &#34;objectives&#34;: &#34;\n            - Ley de Faraday: fem inducida por cambio de flujo magnético\n            - Ley de Lenz y el principio de oposición\n            - Concepto de autoinducción e inductancia mutua\n          &#34;,
+      &#34;orderIndex&#34;: 12,
+      &#34;slots&#34;: [],
+      &#34;title&#34;: &#34;Clase 12 — Ley de Faraday–Lenz e Inducción&#34;
+    },
+    {
+      &#34;courseId&#34;: 1,
+      &#34;description&#34;: &#34;Análisis de circuitos con resistencia, inductancia y capacitancia.&#34;,
+      &#34;id&#34;: 51,
+      &#34;materials&#34;: [],
+      &#34;objectives&#34;: &#34;\n            - Circuitos con resistencia, inductancia y capacitancia\n            - Ecuaciones diferenciales y soluciones generales\n            - Régimen subamortiguado, crítico y sobreamortiguado\n            - Condiciones de resonancia en circuitos RLC\n          &#34;,
+      &#34;orderIndex&#34;: 13,
+      &#34;slots&#34;: [],
+      &#34;title&#34;: &#34;Clase 13 — Circuito RLC&#34;
+    },
+    {
+      &#34;courseId&#34;: 1,
+      &#34;description&#34;: &#34;Propagación de ondas electromagnéticas y ecuaciones de Maxwell.&#34;,
+      &#34;id&#34;: 52,
+      &#34;materials&#34;: [],
+      &#34;objectives&#34;: &#34;\n            - Concepto de onda electromagnética\n            - Relación entre campo eléctrico y magnético en propagación\n            - Velocidad de propagación y energía asociada\n            - Ondas planas en el vacío a partir de Maxwell\n            - Aplicaciones generales de ondas electromagnéticas\n          &#34;,
+      &#34;orderIndex&#34;: 14,
+      &#34;slots&#34;: [],
+      &#34;title&#34;: &#34;Clase 14 — Ondas Electromagnéticas&#34;
+    }
+  ],
+  &#34;description&#34;: &#34;\n        Este curso aborda uno de los pilares de la física universitaria: cómo se comportan las cargas, los campos y las corrientes.\n        Partimos con la electrostática, entendiendo fuerzas, potenciales y la ley de Gauss; avanzamos luego hacia la corriente eléctrica y los circuitos,\n        desde resistencias simples hasta circuitos RC con capac\n        magnéticos con las leyes de Biot-Savart y Ampère, y finalmente cerramos con los campos electromagnéticos variables, incluyendo inducción, inductores,\n        circuitos RLC y corriente alterna\n      &#34;,
+  &#34;id&#34;: 1,
+  &#34;isActive&#34;: true,
+  &#34;professors&#34;: [
+    {
+      &#34;bio&#34;: &#34;Carloz Saez&#34;,
+      &#34;confirmed&#34;: true,
+      &#34;email&#34;: &#34;csaez@uc.cl&#34;,
+      &#34;id&#34;: 1,
+      &#34;name&#34;: &#34;Carlos Saez&#34;,
+      &#34;passwordHash&#34;: &#34;$2a$10$Qm4wZtH/zDsljXApl2KAGuYnwIC9AsgYfiCrV4O1hqvJiObVJD6Kq&#34;,
+      &#34;phone&#34;: null,
+      &#34;profilePictureUrl&#34;: &#34;&#34;,
+      &#34;resetTokenExpiresAt&#34;: null,
+      &#34;resetTokenHash&#34;: null,
+      &#34;rut&#34;: &#34;12.345.678-9&#34;
+    }
+  ],
+  &#34;students&#34;: [],
+  &#34;title&#34;: &#34;Electricidad y Magnetismo&#34;
+}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="request-card" data-method="GET" data-path="/admin/courses/3" data-status="200">
+                <div class="request-header" onclick="toggleRequest('72bacf9556bf0bfebbd6158e07131b8a6a7c64447a3e258643eaa2019e13e196')">
+                    <div style="display: flex; align-items: center; flex: 1;">
+                        <span class="request-method method-get">GET</span>
+                        <span class="request-path">/admin/courses/3</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span class="request-status status-2xx">200</span>
+                        <span class="request-toggle" id="toggle-72bacf9556bf0bfebbd6158e07131b8a6a7c64447a3e258643eaa2019e13e196">▼</span>
+                    </div>
+                </div>
+                <div class="request-content" id="content-72bacf9556bf0bfebbd6158e07131b8a6a7c64447a3e258643eaa2019e13e196">
+                    <div class="hash">Hash: 72bacf9556bf0bfebbd6158e07131b8a6a7c64447a3e258643eaa2019e13e196</div>
+
+                    <div class="section">
+                        <div class="section-title">Response Headers</div>
+                        <table class="headers-table">
+                            <thead>
+                                <tr>
+                                    <th>Header</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Credentials</strong></td>
+                                    <td>true<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Origin</strong></td>
+                                    <td>http://localhost:4321<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Alt-Svc</strong></td>
+                                    <td>h3=&#34;:443&#34;; ma=2592000<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Content-Length</strong></td>
+                                    <td>6560<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Content-Type</strong></td>
+                                    <td>application/json; charset=utf-8<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Date</strong></td>
+                                    <td>Sat, 27 Dec 2025 22:28:08 GMT<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Etag</strong></td>
+                                    <td>W/&#34;19a0-6g5J4AYLTTbPZ2Th9gFjtmd54Uw&#34;<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Vary</strong></td>
+                                    <td>Origin<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>X-Powered-By</strong></td>
+                                    <td>Express<br></td>
+                                </tr>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">Response Body</div>
+                        <div class="body-container">
+                            <div class="body-content body-json">{
+  &#34;_count&#34;: {
+    &#34;classes&#34;: 10,
+    &#34;professors&#34;: 1,
+    &#34;students&#34;: 0
+  },
+  &#34;acronym&#34;: &#34;ICS1113&#34;,
+  &#34;classes&#34;: [
+    {
+      &#34;courseId&#34;: 3,
+      &#34;description&#34;: &#34;Fundamentos de modelación matemática para problemas de optimización.&#34;,
+      &#34;id&#34;: 29,
+      &#34;materials&#34;: [],
+      &#34;objectives&#34;: &#34;\n            - Identificación de variables de decisión, conjuntos, parámetros y restricciones\n            - Construcción de la función objetivo a partir de problemas reales\n            - Tipos de variables: continuas, enteras, binarias\n            - Tipos de restricciones: Big-M, exclusión, máximo de días seguidos\n          &#34;,
+      &#34;orderIndex&#34;: 1,
+      &#34;slots&#34;: [],
+      &#34;title&#34;: &#34;Clase 1 — Modelación I&#34;
+    },
+    {
+      &#34;courseId&#34;: 3,
+      &#34;description&#34;: &#34;Modelación avanzada con múltiples restricciones y problemas complejos.&#34;,
+      &#34;id&#34;: 30,
+      &#34;materials&#34;: [],
+      &#34;objectives&#34;: &#34;\n            - Modelos con múltiples restricciones\n            - Problemas de distribución\n            - Problemas de asignación\n            - Problemas de exclusión\n          &#34;,
+      &#34;orderIndex&#34;: 2,
+      &#34;slots&#34;: [],
+      &#34;title&#34;: &#34;Clase 2 — Modelación II&#34;
+    },
+    {
+      &#34;courseId&#34;: 3,
+      &#34;description&#34;: &#34;Bases teóricas que sustentan la optimización matemática.&#34;,
+      &#34;id&#34;: 31,
+      &#34;materials&#34;: [],
+      &#34;objectives&#34;: &#34;\n            - Teorema de Bolzano–Weierstrass: existencia de puntos de acumulación\n            - Condiciones de existencia de soluciones\n            - Definición de convexidad: funciones convexas, conjuntos convexos\n            - Propiedades de convexidad y soluciones globales\n            - Modelos equivalentes\n          &#34;,
+      &#34;orderIndex&#34;: 3,
+      &#34;slots&#34;: [],
+      &#34;title&#34;: &#34;Clase 3 — Fundamentos Matemáticos&#34;
+    },
+    {
+      &#34;courseId&#34;: 3,
+      &#34;description&#34;: &#34;Introducción a programación lineal y su geometría asociada.&#34;,
+      &#34;id&#34;: 32,
+      &#34;materials&#34;: [],
+      &#34;objectives&#34;: &#34;\n            - Definición de programación lineal (PL) en forma estándar\n            - Geometría de poliedros: conjunto factible\n            - Poliedros y politopos\n            - Concepto de rayos de escape\n            - Relación entre vértices y soluciones óptimas\n          &#34;,
+      &#34;orderIndex&#34;: 4,
+      &#34;slots&#34;: [],
+      &#34;title&#34;: &#34;Clase 4 — Programación Lineal y Geometría Poliédrica&#34;
+    },
+    {
+      &#34;courseId&#34;: 3,
+      &#34;description&#34;: &#34;Algoritmo simplex para resolver problemas de programación lineal.&#34;,
+      &#34;id&#34;: 33,
+      &#34;materials&#34;: [],
+      &#34;objectives&#34;: &#34;\n            - Idea del algoritmo: recorrer vértices del poliedro factible\n            - Construcción de la tabla simplex\n            - Regla de pivoteo: variable entrante y saliente\n            - Criterios de optimalidad\n          &#34;,
+      &#34;orderIndex&#34;: 5,
+      &#34;slots&#34;: [],
+      &#34;title&#34;: &#34;Clase 5 — Método Simplex (Fase II)&#34;
+    },
+    {
+      &#34;courseId&#34;: 3,
+      &#34;description&#34;: &#34;Casos especiales del simplex y método para encontrar solución inicial.&#34;,
+      &#34;id&#34;: 34,
+      &#34;materials&#34;: [],
+      &#34;objectives&#34;: &#34;\n            - Degeneración y ciclo\n            - Múltiples soluciones óptimas\n            - Problemas acotados y no acotados\n            - Inexistencia de solución factible\n            - Método de la Fase I\n          &#34;,
+      &#34;orderIndex&#34;: 6,
+      &#34;slots&#34;: [],
+      &#34;title&#34;: &#34;Clase 6 — Método Simplex: Casos Especiales y Fase I&#34;
+    },
+    {
+      &#34;courseId&#34;: 3,
+      &#34;description&#34;: &#34;Análisis de sensibilidad y teoría de dualidad en programación lineal.&#34;,
+      &#34;id&#34;: 35,
+      &#34;materials&#34;: [],
+      &#34;objectives&#34;: &#34;\n            - Sensibilidad: variaciones de coeficientes\n            - Análisis de rango en coeficientes de función objetivo\n            - Definición del problema dual\n            - Interpretación económica de variables duales (precios sombra)\n            - Teorema de dualidad fuerte y débil\n          &#34;,
+      &#34;orderIndex&#34;: 7,
+      &#34;slots&#34;: [],
+      &#34;title&#34;: &#34;Clase 7 — Análisis Postóptimo y Dualidad&#34;
+    },
+    {
+      &#34;courseId&#34;: 3,
+      &#34;description&#34;: &#34;Optimización con variables enteras y algoritmos de resolución.&#34;,
+      &#34;id&#34;: 36,
+      &#34;materials&#34;: [],
+      &#34;objectives&#34;: &#34;\n            - Introducción a problemas con variables enteras\n            - Diferencia entre PL continua y entera\n            - Método de branch and bound\n            - Algoritmos de cortes de Gomory\n          &#34;,
+      &#34;orderIndex&#34;: 8,
+      &#34;slots&#34;: [],
+      &#34;title&#34;: &#34;Clase 8 — Programación Entera&#34;
+    },
+    {
+      &#34;courseId&#34;: 3,
+      &#34;description&#34;: &#34;Fundamentos de optimización no lineal sin restricciones.&#34;,
+      &#34;id&#34;: 37,
+      &#34;materials&#34;: [],
+      &#34;objectives&#34;: &#34;\n            - Definición de problemas no lineales\n            - Condiciones de optimalidad de primer y segundo orden\n            - Métodos de búsqueda: descenso más pronunciado, Newton\n            - Propiedades de convexidad en funciones no lineales\n          &#34;,
+      &#34;orderIndex&#34;: 9,
+      &#34;slots&#34;: [],
+      &#34;title&#34;: &#34;Clase 9 — Optimización No Lineal Irrestricta&#34;
+    },
+    {
+      &#34;courseId&#34;: 3,
+      &#34;description&#34;: &#34;Optimización no lineal con restricciones de igualdad y desigualdad.&#34;,
+      &#34;id&#34;: 38,
+      &#34;materials&#34;: [],
+      &#34;objectives&#34;: &#34;\n            - Incorporación de restricciones de igualdad y desigualdad\n            - Multiplicadores de Lagrange y condiciones KKT\n            - Interpretación de multiplicadores como precios sombra\n            - Métodos de resolución\n            - Diferencias entre problemas convexos y no convexos\n          &#34;,
+      &#34;orderIndex&#34;: 10,
+      &#34;slots&#34;: [],
+      &#34;title&#34;: &#34;Clase 10 — Optimización No Lineal Restringida&#34;
+    }
+  ],
+  &#34;description&#34;: &#34;\n        Este curso entrega las bases para formular y resolver problemas de decisión en ingeniería, economía y ciencias aplicadas.\n        Comienza con la **modelación matemática**, aprendiendo a traducir situaciones reales en funciones objetivo y restricciones,\n        y se revisan los fundamentos teóricos que aseguran la validez de los modelos: **existencia de soluciones, convexidad y equivalencias**.\n\n        **Contenidos principales:**\n\n        - **Modelación Matemática** - Variables de decisión, función objetivo, restricciones y tipos de modelos\n        - **Fundamentos Teóricos** - Teorema de Bolzano-Weierstrass, convexidad y condiciones de existencia\n        - **Programación Lineal** - Geometría poliédrica, método simplex, análisis postóptimo y dualidad\n        - **Programación Entera** - Variables enteras, branch and bound, cortes de Gomory\n        - **Optimización No Lineal** - Condiciones de optimalidad, multiplicadores de Lagrange, condiciones KKT\n\n        El curso combina teoría rigurosa con aplicaciones prácticas, preparando a los estudiantes para resolver problemas\n        reales de optimización en contextos industriales, financieros y logísticos.\n      &#34;,
+  &#34;id&#34;: 3,
+  &#34;isActive&#34;: true,
+  &#34;professors&#34;: [
+    {
+      &#34;bio&#34;: &#34;Carloz Saez&#34;,
+      &#34;confirmed&#34;: true,
+      &#34;email&#34;: &#34;csaez@uc.cl&#34;,
+      &#34;id&#34;: 1,
+      &#34;name&#34;: &#34;Carlos Saez&#34;,
+      &#34;passwordHash&#34;: &#34;$2a$10$Qm4wZtH/zDsljXApl2KAGuYnwIC9AsgYfiCrV4O1hqvJiObVJD6Kq&#34;,
+      &#34;phone&#34;: null,
+      &#34;profilePictureUrl&#34;: &#34;&#34;,
+      &#34;resetTokenExpiresAt&#34;: null,
+      &#34;resetTokenHash&#34;: null,
+      &#34;rut&#34;: &#34;12.345.678-9&#34;
+    }
+  ],
+  &#34;students&#34;: [],
+  &#34;title&#34;: &#34;Optimización&#34;
+}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="request-card" data-method="GET" data-path="/admin/dashboard" data-status="304">
+                <div class="request-header" onclick="toggleRequest('5c14b8071d6d96a21f293d92eeed4ddc31c263abccd0c1f287de2612cb02a158')">
+                    <div style="display: flex; align-items: center; flex: 1;">
+                        <span class="request-method method-get">GET</span>
+                        <span class="request-path">/admin/dashboard</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span class="request-status status-3xx">304</span>
+                        <span class="request-toggle" id="toggle-5c14b8071d6d96a21f293d92eeed4ddc31c263abccd0c1f287de2612cb02a158">▼</span>
+                    </div>
+                </div>
+                <div class="request-content" id="content-5c14b8071d6d96a21f293d92eeed4ddc31c263abccd0c1f287de2612cb02a158">
+                    <div class="hash">Hash: 5c14b8071d6d96a21f293d92eeed4ddc31c263abccd0c1f287de2612cb02a158</div>
+
+                    <div class="section">
+                        <div class="section-title">Response Headers</div>
+                        <table class="headers-table">
+                            <thead>
+                                <tr>
+                                    <th>Header</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Credentials</strong></td>
+                                    <td>true<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Origin</strong></td>
+                                    <td>http://localhost:4321<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Alt-Svc</strong></td>
+                                    <td>h3=&#34;:443&#34;; ma=2592000<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Date</strong></td>
+                                    <td>Sat, 27 Dec 2025 22:21:37 GMT<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Etag</strong></td>
+                                    <td>W/&#34;f6-HhGfVLQjpl5WGa3g/mssuF0teGc&#34;<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Vary</strong></td>
+                                    <td>Origin<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>X-Powered-By</strong></td>
+                                    <td>Express<br></td>
+                                </tr>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">Response Body</div>
+                        <div class="body-container">
+                            <div class="body-content body-empty"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="request-card" data-method="GET" data-path="/admin/me" data-status="200">
+                <div class="request-header" onclick="toggleRequest('c592a013df7cfaf1d6b17272aad0c9022b2e0d7fb9e5cc88ef1d88867d7345c9')">
+                    <div style="display: flex; align-items: center; flex: 1;">
+                        <span class="request-method method-get">GET</span>
+                        <span class="request-path">/admin/me</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span class="request-status status-2xx">200</span>
+                        <span class="request-toggle" id="toggle-c592a013df7cfaf1d6b17272aad0c9022b2e0d7fb9e5cc88ef1d88867d7345c9">▼</span>
+                    </div>
+                </div>
+                <div class="request-content" id="content-c592a013df7cfaf1d6b17272aad0c9022b2e0d7fb9e5cc88ef1d88867d7345c9">
+                    <div class="hash">Hash: c592a013df7cfaf1d6b17272aad0c9022b2e0d7fb9e5cc88ef1d88867d7345c9</div>
+
+                    <div class="section">
+                        <div class="section-title">Response Headers</div>
+                        <table class="headers-table">
+                            <thead>
+                                <tr>
+                                    <th>Header</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Credentials</strong></td>
+                                    <td>true<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Origin</strong></td>
+                                    <td>http://localhost:4321<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Alt-Svc</strong></td>
+                                    <td>h3=&#34;:443&#34;; ma=2592000<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Content-Length</strong></td>
+                                    <td>85<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Content-Type</strong></td>
+                                    <td>application/json; charset=utf-8<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Date</strong></td>
+                                    <td>Sat, 27 Dec 2025 22:27:24 GMT<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Etag</strong></td>
+                                    <td>W/&#34;55-M1QCzxFxh6hf5ep2t73lTRrh39c&#34;<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Vary</strong></td>
+                                    <td>Origin<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>X-Powered-By</strong></td>
+                                    <td>Express<br></td>
+                                </tr>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">Response Body</div>
+                        <div class="body-container">
+                            <div class="body-content body-json">{
+  &#34;email&#34;: &#34;salvaramos.ing@gmail.com&#34;,
+  &#34;id&#34;: 1,
+  &#34;name&#34;: &#34;Carlos Saez&#34;,
+  &#34;rut&#34;: &#34;12.345.678-9&#34;
+}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="request-card" data-method="GET" data-path="/slots" data-status="304">
+                <div class="request-header" onclick="toggleRequest('68d168568388bb871438b2ec54030668c48b487e22e9d2c2c7d2ce742015ebdb')">
+                    <div style="display: flex; align-items: center; flex: 1;">
+                        <span class="request-method method-get">GET</span>
+                        <span class="request-path">/slots</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span class="request-status status-3xx">304</span>
+                        <span class="request-toggle" id="toggle-68d168568388bb871438b2ec54030668c48b487e22e9d2c2c7d2ce742015ebdb">▼</span>
+                    </div>
+                </div>
+                <div class="request-content" id="content-68d168568388bb871438b2ec54030668c48b487e22e9d2c2c7d2ce742015ebdb">
+                    <div class="hash">Hash: 68d168568388bb871438b2ec54030668c48b487e22e9d2c2c7d2ce742015ebdb</div>
+
+                    <div class="section">
+                        <div class="section-title">Response Headers</div>
+                        <table class="headers-table">
+                            <thead>
+                                <tr>
+                                    <th>Header</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Credentials</strong></td>
+                                    <td>true<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Origin</strong></td>
+                                    <td>http://localhost:4321<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Alt-Svc</strong></td>
+                                    <td>h3=&#34;:443&#34;; ma=2592000<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Date</strong></td>
+                                    <td>Sat, 27 Dec 2025 22:21:39 GMT<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Etag</strong></td>
+                                    <td>W/&#34;2-l9Fw4VUO7kr8CvBlt4zaMCqXZ0w&#34;<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Vary</strong></td>
+                                    <td>Origin<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>X-Powered-By</strong></td>
+                                    <td>Express<br></td>
+                                </tr>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">Response Body</div>
+                        <div class="body-container">
+                            <div class="body-content body-empty"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="request-card" data-method="GET" data-path="/students" data-status="404">
+                <div class="request-header" onclick="toggleRequest('3f90b2a5f1be4d5cf432bb4be09fa1dcd7570a0d2564c55a0899013f51115f09')">
+                    <div style="display: flex; align-items: center; flex: 1;">
+                        <span class="request-method method-get">GET</span>
+                        <span class="request-path">/students</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span class="request-status status-4xx">404</span>
+                        <span class="request-toggle" id="toggle-3f90b2a5f1be4d5cf432bb4be09fa1dcd7570a0d2564c55a0899013f51115f09">▼</span>
+                    </div>
+                </div>
+                <div class="request-content" id="content-3f90b2a5f1be4d5cf432bb4be09fa1dcd7570a0d2564c55a0899013f51115f09">
+                    <div class="hash">Hash: 3f90b2a5f1be4d5cf432bb4be09fa1dcd7570a0d2564c55a0899013f51115f09</div>
+
+                    <div class="section">
+                        <div class="section-title">Response Headers</div>
+                        <table class="headers-table">
+                            <thead>
+                                <tr>
+                                    <th>Header</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Credentials</strong></td>
+                                    <td>true<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Origin</strong></td>
+                                    <td>http://localhost:4321<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Alt-Svc</strong></td>
+                                    <td>h3=&#34;:443&#34;; ma=2592000<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Content-Length</strong></td>
+                                    <td>147<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Content-Security-Policy</strong></td>
+                                    <td>default-src &#39;none&#39;<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Content-Type</strong></td>
+                                    <td>text/html; charset=utf-8<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Date</strong></td>
+                                    <td>Sat, 27 Dec 2025 22:27:35 GMT<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Vary</strong></td>
+                                    <td>Origin<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>X-Content-Type-Options</strong></td>
+                                    <td>nosniff<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>X-Powered-By</strong></td>
+                                    <td>Express<br></td>
+                                </tr>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">Response Body</div>
+                        <div class="body-container">
+                            <div class="body-content body-html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&#34;en&#34;&gt;
+&lt;head&gt;
+&lt;meta charset=&#34;utf-8&#34;&gt;
+&lt;title&gt;Error&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;pre&gt;Cannot GET /students&lt;/pre&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="request-card" data-method="OPTIONS" data-path="/admin/courses" data-status="204">
+                <div class="request-header" onclick="toggleRequest('2c28f1672d8dcd75b540fe6d8ef4fc7a070bd2188037bbc8476344672fb18eac')">
+                    <div style="display: flex; align-items: center; flex: 1;">
+                        <span class="request-method method-options">OPTIONS</span>
+                        <span class="request-path">/admin/courses</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span class="request-status status-2xx">204</span>
+                        <span class="request-toggle" id="toggle-2c28f1672d8dcd75b540fe6d8ef4fc7a070bd2188037bbc8476344672fb18eac">▼</span>
+                    </div>
+                </div>
+                <div class="request-content" id="content-2c28f1672d8dcd75b540fe6d8ef4fc7a070bd2188037bbc8476344672fb18eac">
+                    <div class="hash">Hash: 2c28f1672d8dcd75b540fe6d8ef4fc7a070bd2188037bbc8476344672fb18eac</div>
+
+                    <div class="section">
+                        <div class="section-title">Response Headers</div>
+                        <table class="headers-table">
+                            <thead>
+                                <tr>
+                                    <th>Header</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Credentials</strong></td>
+                                    <td>true<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Headers</strong></td>
+                                    <td>authorization<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Methods</strong></td>
+                                    <td>GET,HEAD,PUT,PATCH,POST,DELETE<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Origin</strong></td>
+                                    <td>http://localhost:4321<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Alt-Svc</strong></td>
+                                    <td>h3=&#34;:443&#34;; ma=2592000<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Content-Length</strong></td>
+                                    <td>0<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Date</strong></td>
+                                    <td>Sat, 27 Dec 2025 22:27:58 GMT<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Vary</strong></td>
+                                    <td>Origin, Access-Control-Request-Headers<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>X-Powered-By</strong></td>
+                                    <td>Express<br></td>
+                                </tr>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">Response Body</div>
+                        <div class="body-container">
+                            <div class="body-content body-empty"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="request-card" data-method="OPTIONS" data-path="/admin/courses/1" data-status="204">
+                <div class="request-header" onclick="toggleRequest('389ca62c1054722f3ab60dc9320d884288e7b6cc883063bb52bb7cba005dee04')">
+                    <div style="display: flex; align-items: center; flex: 1;">
+                        <span class="request-method method-options">OPTIONS</span>
+                        <span class="request-path">/admin/courses/1</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span class="request-status status-2xx">204</span>
+                        <span class="request-toggle" id="toggle-389ca62c1054722f3ab60dc9320d884288e7b6cc883063bb52bb7cba005dee04">▼</span>
+                    </div>
+                </div>
+                <div class="request-content" id="content-389ca62c1054722f3ab60dc9320d884288e7b6cc883063bb52bb7cba005dee04">
+                    <div class="hash">Hash: 389ca62c1054722f3ab60dc9320d884288e7b6cc883063bb52bb7cba005dee04</div>
+
+                    <div class="section">
+                        <div class="section-title">Response Headers</div>
+                        <table class="headers-table">
+                            <thead>
+                                <tr>
+                                    <th>Header</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Credentials</strong></td>
+                                    <td>true<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Headers</strong></td>
+                                    <td>authorization<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Methods</strong></td>
+                                    <td>GET,HEAD,PUT,PATCH,POST,DELETE<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Origin</strong></td>
+                                    <td>http://localhost:4321<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Alt-Svc</strong></td>
+                                    <td>h3=&#34;:443&#34;; ma=2592000<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Content-Length</strong></td>
+                                    <td>0<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Date</strong></td>
+                                    <td>Sat, 27 Dec 2025 22:28:01 GMT<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Vary</strong></td>
+                                    <td>Origin, Access-Control-Request-Headers<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>X-Powered-By</strong></td>
+                                    <td>Express<br></td>
+                                </tr>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">Response Body</div>
+                        <div class="body-container">
+                            <div class="body-content body-empty"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="request-card" data-method="OPTIONS" data-path="/admin/courses/3" data-status="204">
+                <div class="request-header" onclick="toggleRequest('35271bb805628d5b9e0f05f570a5fcba0a9aea077ba6e5ce20de72b6ed663a82')">
+                    <div style="display: flex; align-items: center; flex: 1;">
+                        <span class="request-method method-options">OPTIONS</span>
+                        <span class="request-path">/admin/courses/3</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span class="request-status status-2xx">204</span>
+                        <span class="request-toggle" id="toggle-35271bb805628d5b9e0f05f570a5fcba0a9aea077ba6e5ce20de72b6ed663a82">▼</span>
+                    </div>
+                </div>
+                <div class="request-content" id="content-35271bb805628d5b9e0f05f570a5fcba0a9aea077ba6e5ce20de72b6ed663a82">
+                    <div class="hash">Hash: 35271bb805628d5b9e0f05f570a5fcba0a9aea077ba6e5ce20de72b6ed663a82</div>
+
+                    <div class="section">
+                        <div class="section-title">Response Headers</div>
+                        <table class="headers-table">
+                            <thead>
+                                <tr>
+                                    <th>Header</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Credentials</strong></td>
+                                    <td>true<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Headers</strong></td>
+                                    <td>authorization<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Methods</strong></td>
+                                    <td>GET,HEAD,PUT,PATCH,POST,DELETE<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Origin</strong></td>
+                                    <td>http://localhost:4321<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Alt-Svc</strong></td>
+                                    <td>h3=&#34;:443&#34;; ma=2592000<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Content-Length</strong></td>
+                                    <td>0<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Date</strong></td>
+                                    <td>Sat, 27 Dec 2025 22:28:07 GMT<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Vary</strong></td>
+                                    <td>Origin, Access-Control-Request-Headers<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>X-Powered-By</strong></td>
+                                    <td>Express<br></td>
+                                </tr>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">Response Body</div>
+                        <div class="body-container">
+                            <div class="body-content body-empty"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="request-card" data-method="OPTIONS" data-path="/admin/dashboard" data-status="204">
+                <div class="request-header" onclick="toggleRequest('77208b99777f10344dbddf5f62163739a33a9e84adc0aff0d8508fe519378d66')">
+                    <div style="display: flex; align-items: center; flex: 1;">
+                        <span class="request-method method-options">OPTIONS</span>
+                        <span class="request-path">/admin/dashboard</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span class="request-status status-2xx">204</span>
+                        <span class="request-toggle" id="toggle-77208b99777f10344dbddf5f62163739a33a9e84adc0aff0d8508fe519378d66">▼</span>
+                    </div>
+                </div>
+                <div class="request-content" id="content-77208b99777f10344dbddf5f62163739a33a9e84adc0aff0d8508fe519378d66">
+                    <div class="hash">Hash: 77208b99777f10344dbddf5f62163739a33a9e84adc0aff0d8508fe519378d66</div>
+
+                    <div class="section">
+                        <div class="section-title">Response Headers</div>
+                        <table class="headers-table">
+                            <thead>
+                                <tr>
+                                    <th>Header</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Credentials</strong></td>
+                                    <td>true<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Headers</strong></td>
+                                    <td>authorization<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Methods</strong></td>
+                                    <td>GET,HEAD,PUT,PATCH,POST,DELETE<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Origin</strong></td>
+                                    <td>http://localhost:4321<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Alt-Svc</strong></td>
+                                    <td>h3=&#34;:443&#34;; ma=2592000<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Content-Length</strong></td>
+                                    <td>0<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Date</strong></td>
+                                    <td>Sat, 27 Dec 2025 22:21:37 GMT<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Vary</strong></td>
+                                    <td>Origin, Access-Control-Request-Headers<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>X-Powered-By</strong></td>
+                                    <td>Express<br></td>
+                                </tr>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">Response Body</div>
+                        <div class="body-container">
+                            <div class="body-content body-empty"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="request-card" data-method="OPTIONS" data-path="/admin/me" data-status="204">
+                <div class="request-header" onclick="toggleRequest('b6cfd73bb13166ad534547bafeabcc13d21abb72dff20c330ce6b2ddcf64be1e')">
+                    <div style="display: flex; align-items: center; flex: 1;">
+                        <span class="request-method method-options">OPTIONS</span>
+                        <span class="request-path">/admin/me</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span class="request-status status-2xx">204</span>
+                        <span class="request-toggle" id="toggle-b6cfd73bb13166ad534547bafeabcc13d21abb72dff20c330ce6b2ddcf64be1e">▼</span>
+                    </div>
+                </div>
+                <div class="request-content" id="content-b6cfd73bb13166ad534547bafeabcc13d21abb72dff20c330ce6b2ddcf64be1e">
+                    <div class="hash">Hash: b6cfd73bb13166ad534547bafeabcc13d21abb72dff20c330ce6b2ddcf64be1e</div>
+
+                    <div class="section">
+                        <div class="section-title">Response Headers</div>
+                        <table class="headers-table">
+                            <thead>
+                                <tr>
+                                    <th>Header</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Credentials</strong></td>
+                                    <td>true<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Headers</strong></td>
+                                    <td>authorization<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Methods</strong></td>
+                                    <td>GET,HEAD,PUT,PATCH,POST,DELETE<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Origin</strong></td>
+                                    <td>http://localhost:4321<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Alt-Svc</strong></td>
+                                    <td>h3=&#34;:443&#34;; ma=2592000<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Content-Length</strong></td>
+                                    <td>0<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Date</strong></td>
+                                    <td>Sat, 27 Dec 2025 22:27:24 GMT<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Vary</strong></td>
+                                    <td>Origin, Access-Control-Request-Headers<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>X-Powered-By</strong></td>
+                                    <td>Express<br></td>
+                                </tr>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">Response Body</div>
+                        <div class="body-container">
+                            <div class="body-content body-empty"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="request-card" data-method="OPTIONS" data-path="/slots" data-status="204">
+                <div class="request-header" onclick="toggleRequest('e575a7e969226863dadd325f1f6b8cdf4aa821ee087693d42c2bacebb31a19ee')">
+                    <div style="display: flex; align-items: center; flex: 1;">
+                        <span class="request-method method-options">OPTIONS</span>
+                        <span class="request-path">/slots</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span class="request-status status-2xx">204</span>
+                        <span class="request-toggle" id="toggle-e575a7e969226863dadd325f1f6b8cdf4aa821ee087693d42c2bacebb31a19ee">▼</span>
+                    </div>
+                </div>
+                <div class="request-content" id="content-e575a7e969226863dadd325f1f6b8cdf4aa821ee087693d42c2bacebb31a19ee">
+                    <div class="hash">Hash: e575a7e969226863dadd325f1f6b8cdf4aa821ee087693d42c2bacebb31a19ee</div>
+
+                    <div class="section">
+                        <div class="section-title">Response Headers</div>
+                        <table class="headers-table">
+                            <thead>
+                                <tr>
+                                    <th>Header</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Credentials</strong></td>
+                                    <td>true<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Headers</strong></td>
+                                    <td>authorization<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Methods</strong></td>
+                                    <td>GET,HEAD,PUT,PATCH,POST,DELETE<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Origin</strong></td>
+                                    <td>http://localhost:4321<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Alt-Svc</strong></td>
+                                    <td>h3=&#34;:443&#34;; ma=2592000<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Content-Length</strong></td>
+                                    <td>0<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Date</strong></td>
+                                    <td>Sat, 27 Dec 2025 22:21:39 GMT<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Vary</strong></td>
+                                    <td>Origin, Access-Control-Request-Headers<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>X-Powered-By</strong></td>
+                                    <td>Express<br></td>
+                                </tr>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">Response Body</div>
+                        <div class="body-container">
+                            <div class="body-content body-empty"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="request-card" data-method="OPTIONS" data-path="/students" data-status="204">
+                <div class="request-header" onclick="toggleRequest('c2c9441cc3c3a5a386f2eba1a3bf690178517e21d203eeb1b029ae8fa96b8a7a')">
+                    <div style="display: flex; align-items: center; flex: 1;">
+                        <span class="request-method method-options">OPTIONS</span>
+                        <span class="request-path">/students</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span class="request-status status-2xx">204</span>
+                        <span class="request-toggle" id="toggle-c2c9441cc3c3a5a386f2eba1a3bf690178517e21d203eeb1b029ae8fa96b8a7a">▼</span>
+                    </div>
+                </div>
+                <div class="request-content" id="content-c2c9441cc3c3a5a386f2eba1a3bf690178517e21d203eeb1b029ae8fa96b8a7a">
+                    <div class="hash">Hash: c2c9441cc3c3a5a386f2eba1a3bf690178517e21d203eeb1b029ae8fa96b8a7a</div>
+
+                    <div class="section">
+                        <div class="section-title">Response Headers</div>
+                        <table class="headers-table">
+                            <thead>
+                                <tr>
+                                    <th>Header</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Credentials</strong></td>
+                                    <td>true<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Headers</strong></td>
+                                    <td>authorization<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Methods</strong></td>
+                                    <td>GET,HEAD,PUT,PATCH,POST,DELETE<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Access-Control-Allow-Origin</strong></td>
+                                    <td>http://localhost:4321<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Alt-Svc</strong></td>
+                                    <td>h3=&#34;:443&#34;; ma=2592000<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Content-Length</strong></td>
+                                    <td>0<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Date</strong></td>
+                                    <td>Sat, 27 Dec 2025 22:27:35 GMT<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>Vary</strong></td>
+                                    <td>Origin, Access-Control-Request-Headers<br></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><strong>X-Powered-By</strong></td>
+                                    <td>Express<br></td>
+                                </tr>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">Response Body</div>
+                        <div class="body-container">
+                            <div class="body-content body-empty"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="no-results" id="no-results" style="display: none;">
+            <p>No requests match your filters.</p>
+        </div>
+    </div>
+
+    <script>
+        function toggleRequest(hash) {
+            const content = document.getElementById('content-' + hash);
+            const toggle = document.getElementById('toggle-' + hash);
+
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                toggle.textContent = '▼';
+            } else {
+                content.classList.add('active');
+                toggle.textContent = '▲';
+            }
+        }
+
+        function updateVisibleCount() {
+            const visible = document.querySelectorAll('.request-card[style*="display: block"], .request-card:not([style*="display: none"])');
+            const visibleCount = Array.from(visible).filter(card =>
+                !card.style.display || card.style.display !== 'none'
+            ).length;
+            document.getElementById('visible-count').textContent = visibleCount;
+        }
+
+        function filterRequests() {
+            const search = document.getElementById('search').value.toLowerCase();
+            const methodFilter = document.getElementById('method-filter').value;
+            const statusFilter = document.getElementById('status-filter').value;
+
+            const cards = document.querySelectorAll('.request-card');
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const method = card.dataset.method;
+                const path = card.dataset.path.toLowerCase();
+                const status = parseInt(card.dataset.status);
+
+                
+                const matchesSearch = !search ||
+                    path.includes(search) ||
+                    method.toLowerCase().includes(search) ||
+                    status.toString().includes(search);
+
+                
+                const matchesMethod = !methodFilter || method === methodFilter;
+
+                
+                let matchesStatus = true;
+                if (statusFilter) {
+                    const statusPrefix = Math.floor(status / 100);
+                    matchesStatus =
+                        (statusFilter === '2xx' && statusPrefix === 2) ||
+                        (statusFilter === '3xx' && statusPrefix === 3) ||
+                        (statusFilter === '4xx' && statusPrefix === 4) ||
+                        (statusFilter === '5xx' && statusPrefix === 5);
+                }
+
+                if (matchesSearch && matchesMethod && matchesStatus) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            document.getElementById('visible-count').textContent = visibleCount;
+            document.getElementById('no-results').style.display = visibleCount === 0 ? 'block' : 'none';
+        }
+
+        document.getElementById('search').addEventListener('input', filterRequests);
+        document.getElementById('method-filter').addEventListener('change', filterRequests);
+        document.getElementById('status-filter').addEventListener('change', filterRequests);
+    </script>
+</body>
+</html>
